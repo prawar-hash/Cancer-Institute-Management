@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { 
-  Menu, X, LogOut, User, LayoutDashboard, Users, FileText, 
-  BrainCircuit, BarChart3, Settings, Bell 
+import {
+  Menu, X, LogOut, User, LayoutDashboard, Users, FileText,
+  BrainCircuit, BarChart3, Settings, Bell
 } from 'lucide-react';
 import { RootState } from '../app/store.ts';
 import { clearCredentials } from '../features/auth/authSlice.ts';
@@ -41,7 +41,7 @@ export default function AppShell({ children }: AppShellProps) {
   return (
     <div className="flex min-h-screen bg-[#F7F8FA] font-sans">
       {/* Desktop Sidebar */}
-      <aside className="hidden w-64 border-r border-gray-200 bg-white md:flex md:flex-col">
+      <aside className="fixed left-0 top-0 z-50 hidden h-screen w-64 border-r border-gray-200 bg-white md:flex md:flex-col">
         <div className="flex h-16 items-center border-b border-gray-200 px-6">
           <Link to="/" className="flex items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0B63CE] text-white font-heading font-black text-lg">
@@ -59,11 +59,10 @@ export default function AppShell({ children }: AppShellProps) {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
-                  isActive
+                className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${isActive
                     ? 'bg-[#0B63CE]/5 text-[#0B63CE]'
                     : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                  }`}
               >
                 <item.icon className="h-5 w-5" />
                 {item.name}
@@ -96,9 +95,9 @@ export default function AppShell({ children }: AppShellProps) {
       </aside>
 
       {/* Mobile Shell */}
-      <div className="flex flex-1 flex-col">
+      <div className="ml-64 flex flex-1 flex-col">
         {/* Sticky Mobile Header */}
-        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6">
+        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6 shadow-sm">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

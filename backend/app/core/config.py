@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Databases
-    DATABASE_URL: str = "mysql+aiomysql://testuser:test123@localhost:3306/cancer_institute"
+    DATABASE_URL: str = "mysql+aiomysql://root:kayas7898@localhost:3306/cancer_institute"
     REDIS_URL: str = "redis://localhost:6379/0"
 
     # Celery

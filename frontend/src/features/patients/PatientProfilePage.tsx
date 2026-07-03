@@ -6,16 +6,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'react-hot-toast';
-import { 
+import {
   ArrowLeft, ShieldAlert, ClipboardList, Activity, Plus, FileSpreadsheet
 } from 'lucide-react';
 import axios from 'axios';
 
-import { 
+import {
   usePatientDetails, usePatientDiagnoses, usePatientTreatments,
   usePatientPrescriptions, usePatientAppointments, usePatientFollowUps,
   usePatientReports, usePatientNotes, useAddDiagnosis, useAddTreatment,
-  useAddNote, useUploadPatientFile 
+  useAddNote, useUploadPatientFile
 } from './patientApi.ts';
 import { RootState } from '../../app/store.ts';
 import Button from '../../components/ui/Button.tsx';
@@ -49,12 +49,12 @@ const treatmentSchema = z.object({
     procedure: z.string().optional(),
     margins: z.string().optional(),
     pathology_status: z.string().optional(),
-    
+
     // Chemo details
     regimen: z.string().optional(),
     cycles_planned: z.string().optional(),
     drugs: z.string().optional(), // We'll split this by comma in submit
-    
+
     // Radiation scheduling details (No radiation dose tracking fields here!)
     modality: z.string().optional(),
     target_site: z.string().optional(),
@@ -70,7 +70,7 @@ export default function PatientProfilePage() {
   const patientId = Number(id);
   const currentUser = useSelector((state: RootState) => state.auth.user);
   const [activeTab, setActiveTab] = useState<'demographics' | 'timeline' | 'treatments' | 'notes' | 'files'>('demographics');
-  
+
   // Modals visibility states
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [isDiagModalOpen, setIsDiagModalOpen] = useState(false);
@@ -265,7 +265,7 @@ export default function PatientProfilePage() {
             <p className="text-xs font-semibold text-gray-400 mt-1">MRN ID: <span className="font-mono text-gray-600 font-bold">{patient.mrn}</span></p>
           </div>
         </div>
-        
+
         {/* Clinician Action Buttons */}
         {currentUser?.role !== 'student' && (
           <div className="flex flex-wrap gap-2">
@@ -289,11 +289,10 @@ export default function PatientProfilePage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-4 text-sm font-semibold capitalize border-b-2 transition-colors focus:outline-none ${
-                activeTab === tab
-                  ? 'border-[#0B63CE] text-[#0B63CE]'
-                  : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700'
-              }`}
+              className={`pb-4 text-sm font-semibold capitalize border-b-2 transition-colors focus:outline-none ${activeTab === tab
+                ? 'border-[#0B63CE] text-[#0B63CE]'
+                : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700'
+                }`}
             >
               {tab === 'files' ? 'Reports & Files' : tab}
             </button>
@@ -329,19 +328,48 @@ export default function PatientProfilePage() {
             </Card>
 
             <Card title="Emergency Contacts">
-              {patient.contacts.length === 0 ? (
-                <p className="text-xs text-gray-400 italic">No contacts registered (or restricted role).</p>
-              ) : (
-                <div className="space-y-4">
-                  {patient.contacts.map((contact: any) => (
-                    <div key={contact.id} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
-                      <p className="text-sm font-semibold text-gray-800">{contact.contact_name}</p>
-                      <p className="text-xs text-gray-400">{contact.relationship}</p>
-                      {contact.phone && <p className="text-xs text-gray-600 mt-1">{contact.phone}</p>}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {(() => {
+                const contacts = Array.isArray(patient?.contacts) ? patient.contacts : [];
+
+                if (contacts.length === 0) {
+                  return (
+                    <p className="text-xs text-gray-400 italic">
+                      No contacts registered (or restricted role).
+                    </p>
+                  );
+                }
+
+                return (
+                  <div className="space-y-4">
+                    {contacts.map((contact: any) => (
+                      <div
+                        key={contact?.id ?? Math.random()}
+                        className="border-b border-gray-100 pb-3 last:border-0 last:pb-0"
+                      >
+                        <p className="text-sm font-semibold text-gray-800">
+                          {contact?.contact_name ?? "Unknown Contact"}
+                        </p>
+
+                        <p className="text-xs text-gray-400">
+                          {contact?.relationship_type ?? contact?.relationship ?? "N/A"}
+                        </p>
+
+                        {contact?.phone && (
+                          <p className="text-xs text-gray-600 mt-1">
+                            {contact.phone}
+                          </p>
+                        )}
+
+                        {contact?.email && (
+                          <p className="text-xs text-gray-500">
+                            {contact.email}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </Card>
           </div>
         )}
@@ -354,11 +382,10 @@ export default function PatientProfilePage() {
               <div className="relative border-l border-gray-200 pl-6 ml-2 space-y-6">
                 {timelineEvents.map((event, index) => (
                   <div key={index} className="relative">
-                    <span className={`absolute -left-[31px] top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white ${
-                      event.type === 'diagnosis' ? 'bg-[#0B63CE]' :
+                    <span className={`absolute -left-[31px] top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white ${event.type === 'diagnosis' ? 'bg-[#0B63CE]' :
                       event.type === 'treatment' ? 'bg-emerald-500' :
-                      event.type === 'prescription' ? 'bg-amber-500' : 'bg-purple-500'
-                    }`} />
+                        event.type === 'prescription' ? 'bg-amber-500' : 'bg-purple-500'
+                      }`} />
                     <span className="text-[10px] font-bold text-gray-400 block">{event.date}</span>
                     <p className="text-sm font-semibold text-[#0E1116] mt-0.5">{event.title}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{event.subtitle}</p>
@@ -431,9 +458,8 @@ export default function PatientProfilePage() {
                             <p className="text-[10px] font-mono text-gray-400 truncate max-w-xs">{r.gcs_uri}</p>
                           </div>
                         </div>
-                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
-                          r.status === 'processed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-                        }`}>
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${r.status === 'processed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                          }`}>
                           {r.status}
                         </span>
                       </div>

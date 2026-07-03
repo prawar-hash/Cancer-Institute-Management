@@ -12,13 +12,24 @@ from app.api.v1.system.routes import router as system_router
 from app.api.v1.ai.routes import router as ai_router
 from app.api.v1.share.routes import router as public_share_router
 from app.api.v1.research.routes import router as research_router
+from contextlib import asynccontextmanager
+from app.db.session import engine
+from app.models import Base
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    yield
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
+    lifespan=lifespan
 )
 
 # CORS Policy configuration

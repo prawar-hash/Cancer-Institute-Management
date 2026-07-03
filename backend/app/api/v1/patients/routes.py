@@ -97,9 +97,18 @@ async def create_patient(
         gender=patient_in.gender,
         status=patient_in.status
     )
+
     db.add(patient)
     await db.commit()
     await db.refresh(patient)
+
+    # 👇 Ye naya code add karo
+    result = await db.execute(
+        select(Patient)
+        .options(selectinload(Patient.contacts))
+        .where(Patient.id == patient.id)
+    )
+    patient = result.scalar_one()
 
     # Write audit log
     await log_action(

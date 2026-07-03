@@ -14,14 +14,16 @@ class PatientContactRead(BaseModel):
     class Config:
         from_attributes = True
 
+
 class PatientCreate(BaseModel):
     """Schema for registering a new patient record."""
     mrn: str = Field(..., max_length=100)
     first_name: str = Field(..., max_length=100)
     last_name: str = Field(..., max_length=100)
     birth_date: datetime.date
-    gender: str = Field(..., max_length=10)  # M, F, O
+    gender: str = Field(..., max_length=10)
     status: str = Field(default="active", max_length=50)
+
 
 class PatientRead(BaseModel):
     """
@@ -35,7 +37,7 @@ class PatientRead(BaseModel):
     birth_date: datetime.date
     gender: str
     status: str
-    contacts: list[PatientContactRead] = []
+    # contacts: list[PatientContactRead] = []
 
     class Config:
         from_attributes = True
@@ -46,18 +48,16 @@ class PatientRead(BaseModel):
         Custom serializer factory that automatically anonymizes PII data fields
         if the current user's role is 'student'.
         """
-        # Convert ORM object to base pydantic schema
-        data = cls.from_attributes(obj)
-        
+        data = cls.model_validate(obj)
+
         if role == "student":
-            # Mask identifying attributes
             data.first_name = "Anonymized"
             data.last_name = f"Patient_{obj.id}"
             data.mrn = "MRN-XXXXX"
-            # Omit emergency contact information entirely
             data.contacts = []
-            
+
         return data
+
 
 class PatientListResponse(BaseModel):
     """Schema representing paginated patient responses."""
