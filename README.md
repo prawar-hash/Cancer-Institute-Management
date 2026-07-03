@@ -1,4 +1,4 @@
-<div align="center">
+<div>
 
 # 🩺✨ OncoSphere
 ### 🚀 AI-Powered Cancer Care & Research Management Platform
