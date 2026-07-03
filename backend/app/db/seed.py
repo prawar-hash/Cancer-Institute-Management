@@ -33,7 +33,7 @@ from app.models import (
     AuditLog,
 )
 
-DATABASE_URL="mysql+aiomysql://KayasSQL:kayas7898@localhost:3306/cancer_institute"
+DATABASE_URL = "mysql+aiomysql://devuser:1234@localhost:3306/cancer_institute"
 
 # Password hashing
 def hash_password(password: str) -> str:
@@ -58,7 +58,7 @@ async def seed_data() -> None:
         async with session.begin():
             # 1. Seed Users (SuperAdmin, Admin, Student)
             print("Seeding Users...")
-            hashed_pw = hash_password("SecurePassword123!")
+            hashed_pw = hash_password("Admin@123")
             super_admin = User(
                 email="superadmin@fake-institute.org",
                 hashed_password=hashed_pw,
