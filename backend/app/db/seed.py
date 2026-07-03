@@ -58,6 +58,7 @@ async def seed_data() -> None:
         async with session.begin():
             # 1. Seed Users (SuperAdmin, Admin, Student)
             print("Seeding Users...")
+            hashed_pw = hash_password("Admin@123!")
             super_admin = User(
                 email="superadmin@fake-institute.org",
                 hashed_password=hashed_pw,
