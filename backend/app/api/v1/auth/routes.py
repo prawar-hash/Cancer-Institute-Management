@@ -54,6 +54,15 @@ async def login(
     """
     result = await db.execute(select(User).where(User.email == user_in.email, User.deleted_at.is_(None)))
     user = result.scalar_one_or_none()
+    
+    print("Entered Email:", user_in.email)
+    print("User Found:", user is not None)
+
+    if user:
+       print("DB Email:", user.email)
+       print("Status:", user.status)
+       print("Password Match:", security.verify_password(user_in.password, user.hashed_password))
+
     if not user or not security.verify_password(user_in.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

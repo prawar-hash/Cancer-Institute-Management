@@ -231,7 +231,7 @@ export default function ReportsPage() {
                 title="Clinical summary document preview"
                 srcDoc={previewHtml}
                 className="w-full h-full border-0"
-                sandbox="allow-modals allow-popups allow-print allow-scripts"
+                sandbox="allow-modals allow-popups allow-scripts allow-same-origin"
               />
             )}
           </div>

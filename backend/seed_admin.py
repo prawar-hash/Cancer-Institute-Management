@@ -1,5 +1,4 @@
 import asyncio
-
 from sqlalchemy import select
 
 from app.db.session import async_session
@@ -7,30 +6,29 @@ from app.models.user import User
 from app.core.security import hash_password
 
 
-async def create_admin():
+async def reset_admin():
     async with async_session() as db:
         result = await db.execute(
-            select(User).where(User.email == "superadmin@fake-institute.org")
+            select(User).where(
+                User.email == "superadmin@fake-institute.org"
+            )
         )
-        existing = result.scalar_one_or_none()
 
-        if existing:
-            print("✅ Super Admin already exists.")
+        admin = result.scalar_one_or_none()
+
+        if not admin:
+            print("❌ Super Admin not found.")
             return
 
-        admin = User(
-            email="superadmin@fake-institute.org",
-            hashed_password=hash_password("Admin@123"),
-            role="super_admin",
-            status="active",
-        )
+        admin.hashed_password = hash_password("Admin@123")
+        admin.status = "active"
 
-        db.add(admin)
         await db.commit()
 
-        print("✅ Super Admin created successfully!")
+        print("✅ Super Admin password reset successfully!")
         print("Email    : superadmin@fake-institute.org")
         print("Password : Admin@123")
 
 
-asyncio.run(create_admin())
+if __name__ == "__main__":
+    asyncio.run(reset_admin())

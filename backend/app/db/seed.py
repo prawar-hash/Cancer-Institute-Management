@@ -83,8 +83,14 @@ async def seed_data() -> None:
             existing = await session.execute(
                 select(User).where(User.email == "superadmin@fake-institute.org")
             )
-            if existing.scalar():
-                print("Users already exist, skipping...")
+            existing_user = existing.scalar_one_or_none()
+
+            if existing_user:
+                print("Super Admin already exists. Updating password...")
+
+                existing_user.hashed_password = hash_password("Admin@123")
+                existing_user.status = "active"
+
             else:
                 session.add_all([super_admin, admin_doc, student_researcher])
                 await session.flush()
