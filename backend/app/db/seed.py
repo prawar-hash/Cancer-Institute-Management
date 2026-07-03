@@ -34,6 +34,7 @@ from app.models import (
 )
 
 DATABASE_URL="mysql+aiomysql://KayasSQL:kayas7898@localhost:3306/cancer_institute"
+DATABASE_URL = "mysql+aiomysql://devuser:1234@localhost:3306/cancer_institute"
 
 # Password hashing
 def hash_password(password: str) -> str:
