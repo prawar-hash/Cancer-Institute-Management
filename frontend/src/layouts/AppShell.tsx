@@ -43,12 +43,14 @@ export default function AppShell({ children }: AppShellProps) {
       {/* Desktop Sidebar */}
       <aside className="fixed left-0 top-0 z-50 hidden h-screen w-64 border-r border-gray-200 bg-white md:flex md:flex-col">
         <div className="flex h-16 items-center border-b border-gray-200 px-6">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0B63CE] text-white font-heading font-black text-lg">
-              α
-            </span>
+          <Link to="/" className="flex items-center gap-3">
+            <img
+              src="/ICSR%20LOGO.png"
+              alt="ICSR Logo"
+              className="h-10 w-10 object-contain rounded-lg"
+            />
             <span className="font-heading font-bold text-[#0E1116] tracking-tight">
-              Antigravity Cancer
+              Onco Sphere
             </span>
           </Link>
         </div>
@@ -60,8 +62,8 @@ export default function AppShell({ children }: AppShellProps) {
                 key={item.name}
                 to={item.path}
                 className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${isActive
-                    ? 'bg-[#0B63CE]/5 text-[#0B63CE]'
-                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-[#0B63CE]/5 text-[#0B63CE]'
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                   }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -107,11 +109,15 @@ export default function AppShell({ children }: AppShellProps) {
             </button>
             <Link to="/" className="flex items-center gap-2 md:hidden">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#0B63CE] text-white font-heading font-black">
-                α
+                <img
+                  src="/ICSR%20LOGO.png"
+                  alt="ICSR Logo"
+                  className="h-10 w-10 object-contain rounded-lg"
+                />
               </span>
             </Link>
             <h2 className="hidden font-heading text-lg font-bold tracking-tight text-[#0E1116] md:block">
-              Cancer Institute Research Platform
+              Cancer Institute AI Management And Research Platform
             </h2>
           </div>
           <div className="flex items-center gap-4">
