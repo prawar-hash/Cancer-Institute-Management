@@ -137,7 +137,7 @@ async def create_treatment(
         status=treatment_in.status,
         start_date=treatment_in.start_date,
         end_date=treatment_in.end_date,
-        doctor_id=treatment_in.doctor_id,
+        doctor_id=treatment_in.doctor_id or current_user.id,
         details=treatment_in.details
     )
     db.add(treatment)

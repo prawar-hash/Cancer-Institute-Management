@@ -123,41 +123,64 @@ export default function PatientProfilePage() {
   const onAddTreatmentSubmit = async (formData: any) => {
     try {
       // Parse form data to compile structured details mapping
+      const typeMap: any = {
+        chemo: "chemotherapy",
+        surgery: "surgery",
+        radiation: "radiation",
+        immunotherapy: "immunotherapy",
+        targeted: "targeted"
+      };
+
       const compiledDetails: Record<string, any> = {};
+
       if (formData.type === 'chemo') {
-        compiledDetails.regimen = formData.details.regimen;
-        compiledDetails.cycles_planned = Number(formData.details.cycles_planned) || 0;
-        compiledDetails.drugs = formData.details.drugs ? formData.details.drugs.split(',').map((s: string) => s.trim()) : [];
-      } else if (formData.type === 'surgery') {
-        compiledDetails.procedure = formData.details.procedure;
-        compiledDetails.margins = formData.details.margins;
-        compiledDetails.pathology_status = formData.details.pathology_status;
-      } else if (formData.type === 'radiation') {
-        compiledDetails.modality = formData.details.modality;
-        compiledDetails.target_site = formData.details.target_site;
-        compiledDetails.technique = formData.details.technique;
-        compiledDetails.fractions_planned = Number(formData.details.fractions_planned) || 0;
+        if (formData.details?.regimen)
+          compiledDetails.regimen = formData.details.regimen;
+
+        if (formData.details?.cycles_planned)
+          compiledDetails.cycles_planned = Number(formData.details.cycles_planned);
+
+        if (formData.details?.drugs)
+          compiledDetails.drugs = formData.details.drugs
+            .split(',')
+            .map((s: string) => s.trim());
       }
 
-      await addTreatmentMutation.mutateAsync({
-        type: formData.type,
+      console.log("FINAL PAYLOAD:", {
+        type: typeMap[formData.type],
         status: formData.status,
         start_date: formData.start_date,
         end_date: formData.end_date || null,
-        doctor_id: formData.doctor_id,
+        doctor_id: formData.doctor_id ?? 10,
         details: compiledDetails
       });
 
+      await addTreatmentMutation.mutateAsync({
+        type: typeMap[formData.type], // ✅ yaha change
+        status: formData.status,
+        start_date: formData.start_date,
+        end_date: formData.end_date || null,
+        doctor_id: currentUser?.id, // ✅ yaha change
+        details: compiledDetails
+      });
       toast.success('Treatment plan recorded!');
       setIsTreatmentModalOpen(false);
       resetTreatment();
-    } catch (err: unknown) {
-      let errorMsg = 'Failed to record treatment';
-      if (axios.isAxiosError(err)) {
-        errorMsg = err.response?.data?.detail || errorMsg;
+    }catch (err: unknown) {
+        let errorMsg = 'Failed to record treatment';
+
+        if (axios.isAxiosError(err)) {
+          const detail = err.response?.data?.detail;
+
+          if (typeof detail === 'string') {
+            errorMsg = detail;
+          } else if (Array.isArray(detail)) {
+            errorMsg = detail.map((e: any) => e.msg).join(', ');
+          }
+        }
+
+        toast.error(errorMsg);
       }
-      toast.error(errorMsg);
-    }
   };
 
   const handleFileUpload = async (file: File) => {
