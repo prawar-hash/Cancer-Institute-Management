@@ -3,14 +3,14 @@ from typing import Any
 
 class ReportCreate(BaseModel):
     type: str = Field(..., max_length=50)  # pathology, radiology, lab
-    gcs_uri: str = Field(..., max_length=500)
+    file_url: str = Field(..., max_length=500)
 
 class ReportRead(BaseModel):
     id: int
     patient_id: int
     uploader_id: int
     type: str
-    gcs_uri: str
+    file_url: str
     raw_text: str | None = None
     status: str
 
@@ -20,7 +20,7 @@ class ReportRead(BaseModel):
 class MedicalImageCreate(BaseModel):
     report_id: int | None = None
     image_type: str = Field(..., max_length=50)  # DICOM_placeholder, PNG, JPEG
-    gcs_uri: str = Field(..., max_length=500)
+    file_url: str = Field(..., max_length=500)
     metadata: dict[str, Any] | None = None
 
 class MedicalImageRead(BaseModel):
@@ -28,7 +28,7 @@ class MedicalImageRead(BaseModel):
     patient_id: int
     report_id: int | None
     image_type: str
-    gcs_uri: str
+    file_url: str
     metadata: dict[str, Any] | None
 
     class Config:
@@ -36,13 +36,13 @@ class MedicalImageRead(BaseModel):
 
 class DocumentCreate(BaseModel):
     doc_type: str = Field(..., max_length=50)  # consent, referral, id_proof
-    gcs_uri: str = Field(..., max_length=500)
+    file_url: str = Field(..., max_length=500)
 
 class DocumentRead(BaseModel):
     id: int
     patient_id: int
     doc_type: str
-    gcs_uri: str
+    file_url: str
 
     class Config:
         from_attributes = True

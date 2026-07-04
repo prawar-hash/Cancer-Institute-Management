@@ -309,7 +309,7 @@ async def seed_data() -> None:
                 patient_id=patients[0].id,
                 uploader_id=admin_doc.id,
                 type="pathology",
-                gcs_uri="gs://fake-bucket/patient_MRN-00123/pathology_report_01.pdf",
+                file_url="gs://fake-bucket/patient_MRN-00123/pathology_report_01.pdf",
                 raw_text="SPECIMEN: Left breast lumpectomy. DIAGNOSIS: Infiltrating ductal carcinoma. Nottingham grade 2. Tumor size: 1.8 cm. Margins uninvolved. 1 out of 3 sentinel lymph nodes positive.",
                 status="completed"
             )
@@ -331,7 +331,7 @@ async def seed_data() -> None:
                 patient_id=patients[0].id,
                 report_id=report.id,
                 image_type="PNG",
-                gcs_uri="gs://fake-bucket/patient_MRN-00123/lymph_node_slice.png",
+                file_url="gs://fake-bucket/patient_MRN-00123/lymph_node_slice.png",
                 metadata={"dimensions": "512x512", "slice_location": "axillary_level_1"}
             )
             session.add_all([ai_summary, image])

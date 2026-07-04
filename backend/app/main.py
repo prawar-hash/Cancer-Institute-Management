@@ -15,7 +15,7 @@ from app.api.v1.research.routes import router as research_router
 from contextlib import asynccontextmanager
 from app.db.session import engine
 from app.models import Base
-
+from app.core.config import settings 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:

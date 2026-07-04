@@ -28,7 +28,7 @@ Storage: Google Cloud Storage, signed URLs, per-patient folder prefixes.
     /models (SQLAlchemy models, one file per domain: patient.py, user.py, report.py, ...)
     /services (business logic, kept out of routes)
     /ai (ocr.py, summarizer.py, chatbot.py, classifiers.py)
-    /storage (gcs_client.py)
+    /storage (cloudinary_client.py)
     /tests
 /frontend
   /src

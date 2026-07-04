@@ -15,7 +15,8 @@ from app.models.clinical import Treatment, Diagnosis
 from app.api.v1.auth.dependencies import require_permission, get_current_user
 from app.services.audit import log_action
 from app.services.upload_service import validate_file_security, run_virus_scan
-from app.storage.gcs_client import gcs_client
+#from app.storage.gcs_client import gcs_client
+from app.storage.cloudinary_client import upload_file
 from app.services.pdf import generate_patient_clinical_summary_html
 
 from app.api.v1.reports.schemas import (
@@ -40,6 +41,7 @@ async def upload_patient_file(
     # 1. Read file to extract metadata (size, content type)
     file_bytes = await file.read()
     file_size = len(file_bytes)
+    file_url = upload_file(file_bytes)   
     
     # 2. Run security and formatting checks
     category = validate_file_security(file.filename, file.content_type, file_size)
@@ -52,10 +54,8 @@ async def upload_patient_file(
         )
         
     # 4. Upload file stream to GCS
-    destination_path = gcs_client.get_scoped_path(patient_id, category, file.filename)
-    file_io = io.BytesIO(file_bytes)
     
-    gcs_uri = gcs_client.upload_file_object(file_io, destination_path, file.content_type)
+    file_io = io.BytesIO(file_bytes)
     
     # 5. Insert Database record based on file classification
     if category == "reports":
@@ -64,7 +64,7 @@ async def upload_patient_file(
             patient_id=patient_id,
             uploader_id=current_user.id,
             type="pathology",  # Default type, can be updated later
-            gcs_uri=gcs_uri,
+            file_url=file_url,
             status="pending"
         )
         db.add(report)
@@ -74,7 +74,7 @@ async def upload_patient_file(
         await log_action(
             db=db, user_id=current_user.id, action="UPLOAD_REPORT",
             target_id=report.id, target_table="reports",
-            details={"mrn_folder": patient_id, "gcs_uri": gcs_uri}
+            details={"mrn_folder": patient_id, "file_url": file_url}
         )
         return report
     else:
@@ -93,7 +93,7 @@ async def upload_patient_file(
             patient_id=patient_id,
             report_id=None,
             image_type=image_type,
-            gcs_uri=gcs_uri,
+            file_url=file_url,
             metadata=metadata
         )
         db.add(img)
@@ -103,7 +103,7 @@ async def upload_patient_file(
         await log_action(
             db=db, user_id=current_user.id, action="UPLOAD_IMAGE",
             target_id=img.id, target_table="medical_images",
-            details={"mrn_folder": patient_id, "gcs_uri": gcs_uri}
+            details={"mrn_folder": patient_id, "file_url": file_url}
         )
         return img
 
@@ -119,7 +119,7 @@ async def create_report(
         patient_id=patient_id,
         uploader_id=current_user.id,
         type=report_in.type,
-        gcs_uri=report_in.gcs_uri,
+        file_url=report_in.file_url,
         status="pending"
     )
     db.add(report)
@@ -155,7 +155,7 @@ async def create_image(
         patient_id=patient_id,
         report_id=img_in.report_id,
         image_type=img_in.image_type,
-        gcs_uri=img_in.gcs_uri,
+        file_url=img_in.file_url,
         metadata=img_in.metadata
     )
     db.add(img)
@@ -190,7 +190,7 @@ async def create_document(
     doc = Document(
         patient_id=patient_id,
         doc_type=doc_in.doc_type,
-        gcs_uri=doc_in.gcs_uri
+        file_url=doc_in.file_url
     )
     db.add(doc)
     await db.commit()

@@ -42,7 +42,7 @@ async def summarize_patient_report(
 
     # Simulate OCR Extraction
     if not report.raw_text:
-        extracted_text = extract_report_text(report.type, report.gcs_uri)
+        extracted_text = extract_report_text(report.type, report.file_url)
         report.raw_text = extracted_text
         report.status = "completed"
         db.add(report)

@@ -1,6 +1,9 @@
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+def upload_file(file):
+    result = cloudinary.uploader.upload(file)
+    return result.get("secure_url")
 
 class Settings(BaseSettings):
     """
@@ -9,7 +12,9 @@ class Settings(BaseSettings):
     """
 
     PROJECT_NAME: str = "Cancer Institute Management & AI Research Platform"
-
+    CLOUDINARY_CLOUD_NAME: str
+    CLOUDINARY_API_KEY: str
+    CLOUDINARY_API_SECRET: str  
     # Security
     SECRET_KEY: str = "placeholder_secret_key_change_me_in_production"
     ALGORITHM: str = "HS256"
@@ -38,6 +43,7 @@ class Settings(BaseSettings):
         ),
         env_file_encoding="utf-8",
         extra="ignore"
+    
     )
 
 

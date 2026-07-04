@@ -153,7 +153,7 @@ erDiagram
         int patient_id FK
         int uploader_id FK
         string type "pathology | radiology | lab"
-        string gcs_uri
+        string file_url
         text raw_text "OCR raw output"
         string status "pending | processing | completed | failed"
         datetime created_at
@@ -166,7 +166,7 @@ erDiagram
         int patient_id FK
         int report_id FK
         string image_type "DICOM_placeholder | PNG | JPEG"
-        string gcs_uri
+        string file_url
         text metadata "JSON details"
         datetime created_at
         datetime updated_at
@@ -177,7 +177,7 @@ erDiagram
         int id PK
         int patient_id FK
         string doc_type "consent | referral | id_proof"
-        string gcs_uri
+        string file_url
         datetime created_at
         datetime updated_at
         datetime deleted_at

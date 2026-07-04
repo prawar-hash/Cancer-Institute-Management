@@ -478,7 +478,7 @@ export default function PatientProfilePage() {
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-gray-800 capitalize">{r.type} Report</p>
-                            <p className="text-[10px] font-mono text-gray-400 truncate max-w-xs">{r.gcs_uri}</p>
+                            <p className="text-[10px] font-mono text-gray-400 truncate max-w-xs">{r.file_url}</p>
                           </div>
                         </div>
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${r.status === 'processed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'

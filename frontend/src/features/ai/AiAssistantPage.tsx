@@ -357,7 +357,7 @@ export default function AiAssistantPage() {
                       <FileText className="h-4 w-4 text-[#0B63CE]" />
                       <span className="text-xs font-bold capitalize">{r.type} scan</span>
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-1 font-mono truncate">{r.gcs_uri}</p>
+                    <p className="text-[10px] text-gray-400 mt-1 font-mono truncate">{r.file_url}</p>
                     <Button
                       variant="primary"
                       size="sm"

@@ -114,7 +114,7 @@ sequenceDiagram
     Note over API: Server-side validation:<br/>Validate size, extension & MIME type
     API->>GCS: Upload report binary (scoped to patient_id folder)
     GCS-->>API: Confirm upload & return GCS object URI
-    API->>DB: Insert Report record (status="PENDING", gcs_uri)
+    API->>DB: Insert Report record (status="PENDING", file_url)
     DB-->>API: Return report_id
     API->>Redis: Enqueue processing job (report_id, patient_id)
     API-->>Admin: HTTP 202 Accepted (report_id, status="PENDING")
@@ -122,7 +122,7 @@ sequenceDiagram
     Note over Worker: Background worker retrieves job
     Worker->>Redis: Fetch next task
     Redis-->>Worker: Processing task details (report_id)
-    Worker->>DB: Fetch Report metadata (gcs_uri)
+    Worker->>DB: Fetch Report metadata (file_url)
     DB-->>Worker: Report details
     Worker->>GCS: Download report file binary
     GCS-->>Worker: File binary

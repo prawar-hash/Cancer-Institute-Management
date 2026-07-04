@@ -11,15 +11,14 @@ from app.models.document import Report, MedicalImage
 MOCK_DOCTOR = User(id=10, email="doctor@fake-institute.org", role="admin", status="active")
 
 @pytest.mark.asyncio
-@patch("app.api.v1.reports.routes.gcs_client")
-async def test_upload_valid_pdf_report(mock_gcs, client) -> None:
-    """Verifies that uploading a valid PDF document succeeds and saves a Report metadata record."""
-    # Mock GCS upload return value
-    mock_gcs.get_scoped_path.return_value = "patients/1/reports/blood_test.pdf"
-    mock_gcs.upload_file_object.return_value = "gs://fake-bucket/patients/1/reports/blood_test.pdf"
+@patch("app.api.v1.reports.routes.upload_file")
+async def test_upload_valid_pdf_report(mock_upload_file, client) -> None:
+    
+    # ✅ Cloudinary returns URL
+    mock_upload_file.return_value = "https://cloudinary.com/fake/blood_test.pdf"
     
     token = security.create_access_token(subject=MOCK_DOCTOR.id)
-    
+
     async def override_get_db():
         class MockSession:
             def add(self, obj):
@@ -41,23 +40,26 @@ async def test_upload_valid_pdf_report(mock_gcs, client) -> None:
     files = {"file": ("blood_test.pdf", b"Dummy PDF file content", "application/pdf")}
     
     response = await client.post("/api/v1/patients/1/upload-file", files=files, headers=headers)
+
     assert response.status_code == 201
     data = response.json()
+
     assert data["status"] == "pending"
     assert data["type"] == "pathology"
-    assert "gcs_uri" in data
-    assert "blood_test.pdf" in data["gcs_uri"]
 
+    # ✅ UPDATED
+    assert "file_url" in data
+    assert "blood_test.pdf" in data["file_url"]
+    
 
 @pytest.mark.asyncio
-@patch("app.api.v1.reports.routes.gcs_client")
-async def test_upload_valid_dicom_image(mock_gcs, client) -> None:
-    """Verifies that uploading a DICOM file saves a MedicalImage with unsupported format flags."""
-    mock_gcs.get_scoped_path.return_value = "patients/1/images/scan.dcm"
-    mock_gcs.upload_file_object.return_value = "gs://fake-bucket/patients/1/images/scan.dcm"
+@patch("app.api.v1.reports.routes.upload_file")
+async def test_upload_valid_dicom_image(mock_upload_file, client) -> None:
+    
+    mock_upload_file.return_value = "https://cloudinary.com/fake/scan.dcm"
     
     token = security.create_access_token(subject=MOCK_DOCTOR.id)
-    
+
     async def override_get_db():
         class MockSession:
             def add(self, obj):
@@ -74,13 +76,15 @@ async def test_upload_valid_dicom_image(mock_gcs, client) -> None:
         yield MockSession()
 
     app.dependency_overrides[get_db] = override_get_db
-    
+
     headers = {"Authorization": f"Bearer {token}"}
-    files = {"file": ("scan.dcm", b"DICOM fake binary header...", "application/dicom")}
+    files = {"file": ("scan.dcm", b"DICOM fake binary", "application/dicom")}
     
     response = await client.post("/api/v1/patients/1/upload-file", files=files, headers=headers)
+
     assert response.status_code == 201
     data = response.json()
+
     assert data["image_type"] == "DICOM_placeholder"
     assert data["metadata"]["image_processing"] == "unsupported format (DICOM placeholder)"
 

@@ -12,7 +12,7 @@ class Report(Base):
     patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id", ondelete="CASCADE"), nullable=False, index=True)
     uploader_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     type: Mapped[str] = mapped_column(String(50), nullable=False)  # pathology, radiology, lab
-    gcs_uri: Mapped[str] = mapped_column(String(500), nullable=False)
+    file_url: Mapped[str] = mapped_column(String(500), nullable=False)
     raw_text: Mapped[str | None] = mapped_column(Text, nullable=True)  # Raw extracted OCR text
     status: Mapped[str] = mapped_column(String(50), default="pending", nullable=False)  # pending, processing, completed, failed
 
@@ -27,7 +27,7 @@ class MedicalImage(Base):
     patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id", ondelete="CASCADE"), nullable=False, index=True)
     report_id: Mapped[int | None] = mapped_column(ForeignKey("reports.id", ondelete="SET NULL"), nullable=True)
     image_type: Mapped[str] = mapped_column(String(50), nullable=False)  # DICOM_placeholder, PNG, JPEG
-    gcs_uri: Mapped[str] = mapped_column(String(500), nullable=False)
+    file_url: Mapped[str] = mapped_column(String(500), nullable=False)
     file_metadata: Mapped[dict | None] = mapped_column(JSON, nullable=True)  # DICOM header mappings, dimensions, tags
 
 
@@ -39,7 +39,7 @@ class Document(Base):
 
     patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id", ondelete="CASCADE"), nullable=False, index=True)
     doc_type: Mapped[str] = mapped_column(String(50), nullable=False)  # consent, referral, id_proof
-    gcs_uri: Mapped[str] = mapped_column(String(500), nullable=False)
+    file_url: Mapped[str] = mapped_column(String(500), nullable=False)
 
 
 class AiSummary(Base):
