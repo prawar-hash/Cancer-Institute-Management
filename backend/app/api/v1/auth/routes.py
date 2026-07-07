@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from datetime import timedelta
+from datetime import datetime
 
 from app.core import security
 from app.core import permissions
@@ -196,3 +196,28 @@ async def oauth_facebook(oauth_in: OAuthLoginRequest, db: AsyncSession = Depends
     
     access_token = security.create_access_token(subject=user.id)
     return {"access_token": access_token, "token_type": "bearer", "user": user}
+@router.delete("/users/{user_id}", status_code=200)
+async def delete_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_permission(permissions.USER_MANAGE))
+):
+    """
+    Delete a user (only SuperAdmin or users with USER_MANAGE permission)
+    """
+    result = await db.execute(select(User).where(User.id == user_id, User.deleted_at.is_(None)))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Prevent self delete (optional safety)
+    if user.id == current_user.id:
+        raise HTTPException(status_code=400, detail="You cannot delete yourself")
+
+    # Soft delete (recommended)
+    user.deleted_at = datetime.utcnow()
+
+    await db.commit()
+
+    return {"message": "User deleted successfully"}

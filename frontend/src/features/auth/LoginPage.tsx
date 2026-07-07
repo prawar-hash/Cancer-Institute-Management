@@ -39,6 +39,7 @@ export default function LoginPage() {
       const { access_token, user } = response.data;
       
       dispatch(setCredentials({ user, token: access_token }));
+      localStorage.setItem("token", access_token);
       toast.success('Successfully signed in!');
       navigate('/');
     } catch (err: unknown) {
@@ -62,6 +63,7 @@ export default function LoginPage() {
       const { access_token, user } = response.data;
       
       dispatch(setCredentials({ user, token: access_token }));
+      localStorage.setItem("token", access_token);
       toast.success(`Signed in with ${provider.charAt(0).toUpperCase() + provider.slice(1)}!`);
       navigate('/');
     } catch {
