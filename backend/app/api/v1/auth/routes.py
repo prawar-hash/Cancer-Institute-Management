@@ -58,10 +58,20 @@ async def login(
     print("Entered Email:", user_in.email)
     print("User Found:", user is not None)
 
+    # if user:
+    #    print("DB Email:", user.email)
+    #    print("Status:", user.status)
+    #    print("Password Match:", security.verify_password(user_in.password, user.hashed_password))
+    
     if user:
-       print("DB Email:", user.email)
-       print("Status:", user.status)
-       print("Password Match:", security.verify_password(user_in.password, user.hashed_password))
+        print("=" * 60)
+        print("Entered Email    :", user_in.email)
+        print("Entered Password :", repr(user_in.password))
+        print("DB Email         :", user.email)
+        print("Status           :", user.status)
+        print("Stored Hash      :", user.hashed_password)
+        print("Password Match   :", security.verify_password(user_in.password, user.hashed_password))
+        print("=" * 60)
 
     if not user or not security.verify_password(user_in.password, user.hashed_password):
         raise HTTPException(
