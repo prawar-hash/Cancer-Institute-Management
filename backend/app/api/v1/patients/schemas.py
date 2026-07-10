@@ -1,6 +1,10 @@
 import datetime
 from pydantic import BaseModel, Field
 
+class FileUploadRequest(BaseModel):
+    file_url: str
+    type: str
+    
 class PatientContactRead(BaseModel):
     """Schema for returning emergency contact data."""
     id: int

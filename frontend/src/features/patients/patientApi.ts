@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api.ts';
 
-// 1. Patient Demographics & Directory Listing
+// ==========================
+// 1. Patients List
+// ==========================
 export function usePatientsList(params: Record<string, unknown>) {
   return useQuery({
     queryKey: ['patients', params],
@@ -14,6 +16,7 @@ export function usePatientsList(params: Record<string, unknown>) {
 
 export function useRegisterPatient() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (patientData: Record<string, unknown>) => {
       const response = await api.post('/api/v1/patients', patientData);
@@ -36,7 +39,9 @@ export function usePatientDetails(patientId: number) {
   });
 }
 
+// ==========================
 // 2. Medical History
+// ==========================
 export function usePatientHistory(patientId: number) {
   return useQuery({
     queryKey: ['patient-history', patientId],
@@ -50,23 +55,33 @@ export function usePatientHistory(patientId: number) {
 
 export function useUpdateHistory(patientId: number) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (historyData: Record<string, unknown>) => {
-      const response = await api.put(`/api/v1/patients/${patientId}/history`, historyData);
+      const response = await api.put(
+        `/api/v1/patients/${patientId}/history`,
+        historyData
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient-history', patientId] });
+      queryClient.invalidateQueries({
+        queryKey: ['patient-history', patientId],
+      });
     },
   });
 }
 
-// 3. Clinical Diagnoses
+// ==========================
+// 3. Diagnoses
+// ==========================
 export function usePatientDiagnoses(patientId: number) {
   return useQuery({
     queryKey: ['patient-diagnoses', patientId],
     queryFn: async () => {
-      const response = await api.get(`/api/v1/patients/${patientId}/diagnoses`);
+      const response = await api.get(
+        `/api/v1/patients/${patientId}/diagnoses`
+      );
       return response.data;
     },
     enabled: !!patientId,
@@ -75,23 +90,33 @@ export function usePatientDiagnoses(patientId: number) {
 
 export function useAddDiagnosis(patientId: number) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (diagnosisData: Record<string, unknown>) => {
-      const response = await api.post(`/api/v1/patients/${patientId}/diagnoses`, diagnosisData);
+      const response = await api.post(
+        `/api/v1/patients/${patientId}/diagnoses`,
+        diagnosisData
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient-diagnoses', patientId] });
+      queryClient.invalidateQueries({
+        queryKey: ['patient-diagnoses', patientId],
+      });
     },
   });
 }
 
-// 4. Clinical Treatments
+// ==========================
+// 4. Treatments
+// ==========================
 export function usePatientTreatments(patientId: number) {
   return useQuery({
     queryKey: ['patient-treatments', patientId],
     queryFn: async () => {
-      const response = await api.get(`/api/v1/patients/${patientId}/treatments`);
+      const response = await api.get(
+        `/api/v1/patients/${patientId}/treatments`
+      );
       return response.data;
     },
     enabled: !!patientId,
@@ -100,23 +125,33 @@ export function usePatientTreatments(patientId: number) {
 
 export function useAddTreatment(patientId: number) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (treatmentData: Record<string, unknown>) => {
-      const response = await api.post(`/api/v1/patients/${patientId}/treatments`, treatmentData);
+      const response = await api.post(
+        `/api/v1/patients/${patientId}/treatments`,
+        treatmentData
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient-treatments', patientId] });
+      queryClient.invalidateQueries({
+        queryKey: ['patient-treatments', patientId],
+      });
     },
   });
 }
 
+// ==========================
 // 5. Prescriptions
+// ==========================
 export function usePatientPrescriptions(patientId: number) {
   return useQuery({
     queryKey: ['patient-prescriptions', patientId],
     queryFn: async () => {
-      const response = await api.get(`/api/v1/patients/${patientId}/prescriptions`);
+      const response = await api.get(
+        `/api/v1/patients/${patientId}/prescriptions`
+      );
       return response.data;
     },
     enabled: !!patientId,
@@ -125,23 +160,33 @@ export function usePatientPrescriptions(patientId: number) {
 
 export function useAddPrescription(patientId: number) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (rxData: Record<string, unknown>) => {
-      const response = await api.post(`/api/v1/patients/${patientId}/prescriptions`, rxData);
+      const response = await api.post(
+        `/api/v1/patients/${patientId}/prescriptions`,
+        rxData
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient-prescriptions', patientId] });
+      queryClient.invalidateQueries({
+        queryKey: ['patient-prescriptions', patientId],
+      });
     },
   });
 }
 
+// ==========================
 // 6. Appointments
+// ==========================
 export function usePatientAppointments(patientId: number) {
   return useQuery({
     queryKey: ['patient-appointments', patientId],
     queryFn: async () => {
-      const response = await api.get(`/api/v1/patients/${patientId}/appointments`);
+      const response = await api.get(
+        `/api/v1/patients/${patientId}/appointments`
+      );
       return response.data;
     },
     enabled: !!patientId,
@@ -150,23 +195,33 @@ export function usePatientAppointments(patientId: number) {
 
 export function useAddAppointment(patientId: number) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (aptData: Record<string, unknown>) => {
-      const response = await api.post(`/api/v1/patients/${patientId}/appointments`, aptData);
+      const response = await api.post(
+        `/api/v1/patients/${patientId}/appointments`,
+        aptData
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient-appointments', patientId] });
+      queryClient.invalidateQueries({
+        queryKey: ['patient-appointments', patientId],
+      });
     },
   });
 }
 
+// ==========================
 // 7. Follow Ups
+// ==========================
 export function usePatientFollowUps(patientId: number) {
   return useQuery({
     queryKey: ['patient-follow-ups', patientId],
     queryFn: async () => {
-      const response = await api.get(`/api/v1/patients/${patientId}/follow-ups`);
+      const response = await api.get(
+        `/api/v1/patients/${patientId}/follow-ups`
+      );
       return response.data;
     },
     enabled: !!patientId,
@@ -175,53 +230,71 @@ export function usePatientFollowUps(patientId: number) {
 
 export function useAddFollowUp(patientId: number) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (fuData: Record<string, unknown>) => {
-      const response = await api.post(`/api/v1/patients/${patientId}/follow-ups`, fuData);
+      const response = await api.post(
+        `/api/v1/patients/${patientId}/follow-ups`,
+        fuData
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient-follow-ups', patientId] });
+      queryClient.invalidateQueries({
+        queryKey: ['patient-follow-ups', patientId],
+      });
     },
   });
 }
 
-// 8. Reports & GCS Uploads
+// ==========================
+// 8. Reports (IMPORTANT)
+// ==========================
 export function usePatientReports(patientId: number) {
   return useQuery({
     queryKey: ['patient-reports', patientId],
     queryFn: async () => {
-      const response = await api.get(`/api/v1/patients/${patientId}/reports`);
+      const response = await api.get(
+        `/api/v1/patients/${patientId}/reports`
+      );
       return response.data;
     },
     enabled: !!patientId,
   });
 }
 
+// ✅ FINAL FIXED VERSION
 export function useUploadPatientFile(patientId: number) {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      const response = await api.post(`/api/v1/patients/${patientId}/upload-file`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+    mutationFn: async (data: { file_url: string; type: string }) => {
+      const response = await api.post(
+        `/api/v1/patients/${patientId}/upload-file`,
+        data
+      );
       return response.data;
     },
+
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient-reports', patientId] });
+      // ✅ AUTO REFRESH REPORT LIST
+      queryClient.invalidateQueries({
+        queryKey: ['patient-reports', patientId],
+      });
     },
   });
 }
 
+// ==========================
+// 9. Notes
+// ==========================
 export function usePatientNotes(patientId: number) {
   return useQuery({
     queryKey: ['patient-notes', patientId],
     queryFn: async () => {
-      const response = await api.get(`/api/v1/patients/${patientId}/notes`);
+      const response = await api.get(
+        `/api/v1/patients/${patientId}/notes`
+      );
       return response.data;
     },
     enabled: !!patientId,
@@ -230,13 +303,19 @@ export function usePatientNotes(patientId: number) {
 
 export function useAddNote(patientId: number) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (noteData: Record<string, unknown>) => {
-      const response = await api.post(`/api/v1/patients/${patientId}/notes`, noteData);
+      const response = await api.post(
+        `/api/v1/patients/${patientId}/notes`,
+        noteData
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient-notes', patientId] });
+      queryClient.invalidateQueries({
+        queryKey: ['patient-notes', patientId],
+      });
     },
   });
 }

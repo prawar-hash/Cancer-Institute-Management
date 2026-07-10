@@ -5,6 +5,9 @@ import { useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import CameraFlow from '../camera/CameraFlow';
+import { uploadToCloudinary } from "../../services/cloudinary";
+import { useRef } from "react";
 import { toast } from 'react-hot-toast';
 import {
   ArrowLeft, ShieldAlert, ClipboardList, Activity, Plus, FileSpreadsheet
@@ -21,7 +24,6 @@ import { RootState } from '../../app/store.ts';
 import Button from '../../components/ui/Button.tsx';
 import Card from '../../components/ui/Card.tsx';
 import Modal from '../../components/ui/Modal.tsx';
-import FileUploadZone from '../../components/shared/FileUploadZone.tsx';
 import TreatmentDetailsWidget from './TreatmentDetailsWidget.tsx';
 
 // Zod schemas for clinical additions
@@ -29,6 +31,7 @@ const noteSchema = z.object({
   note_text: z.string().min(5, 'Note text must be at least 5 characters long'),
   note_type: z.string().default('clinical'),
 });
+
 
 const diagnosisSchema = z.object({
   primary_site: z.string().min(1, 'Primary site is required'),
@@ -92,11 +95,14 @@ export default function PatientProfilePage() {
   const addDiagMutation = useAddDiagnosis(patientId);
   const addTreatmentMutation = useAddTreatment(patientId);
   const uploadFileMutation = useUploadPatientFile(patientId);
+  const [openCamera, setOpenCamera] = useState(false);
+
 
   // Forms hook validation mapping
   const { register: registerNote, handleSubmit: handleNoteSubmit, reset: resetNote, formState: { errors: noteErrors } } = useForm({ resolver: zodResolver(noteSchema) });
   const { register: registerDiag, handleSubmit: handleDiagSubmit, reset: resetDiag, formState: { errors: diagErrors } } = useForm({ resolver: zodResolver(diagnosisSchema) });
   const { register: registerTreatment, handleSubmit: handleTreatmentSubmit, reset: resetTreatment } = useForm({ resolver: zodResolver(treatmentSchema) });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const onAddNoteSubmit = async (formData: any) => {
     try {
@@ -106,6 +112,28 @@ export default function PatientProfilePage() {
       resetNote();
     } catch {
       toast.error('Failed to save doctor note.');
+    }
+  };
+  const handleDeviceUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    try {
+      // agar CameraFlow jaisa hi Cloudinary flow chahiye
+      const url = await uploadToCloudinary(file);
+
+      await uploadFileMutation.mutateAsync({
+        file_url: url,
+        type: "scan",
+      });
+
+      toast.success("Report uploaded successfully");
+
+    } catch {
+      toast.error("Failed to upload report");
     }
   };
 
@@ -166,35 +194,23 @@ export default function PatientProfilePage() {
       toast.success('Treatment plan recorded!');
       setIsTreatmentModalOpen(false);
       resetTreatment();
-    }catch (err: unknown) {
-        let errorMsg = 'Failed to record treatment';
-
-        if (axios.isAxiosError(err)) {
-          const detail = err.response?.data?.detail;
-
-          if (typeof detail === 'string') {
-            errorMsg = detail;
-          } else if (Array.isArray(detail)) {
-            errorMsg = detail.map((e: any) => e.msg).join(', ');
-          }
-        }
-
-        toast.error(errorMsg);
-      }
-  };
-
-  const handleFileUpload = async (file: File) => {
-    try {
-      await uploadFileMutation.mutateAsync(file);
-      toast.success('File uploaded to GCS successfully!');
     } catch (err: unknown) {
-      let errorMsg = 'Failed to upload file';
+      let errorMsg = 'Failed to record treatment';
+
       if (axios.isAxiosError(err)) {
-        errorMsg = err.response?.data?.detail || errorMsg;
+        const detail = err.response?.data?.detail;
+
+        if (typeof detail === 'string') {
+          errorMsg = detail;
+        } else if (Array.isArray(detail)) {
+          errorMsg = detail.map((e: any) => e.msg).join(', ');
+        }
       }
+
       toast.error(errorMsg);
     }
   };
+
 
   // Compile timeline events
   const compileTimeline = () => {
@@ -495,7 +511,55 @@ export default function PatientProfilePage() {
             <div>
               {currentUser?.role !== 'student' ? (
                 <Card title="Upload Document / Capture">
-                  <FileUploadZone onFileSelect={handleFileUpload} />
+                  {/* Upload Options */}
+                  <div className="flex flex-col gap-2">
+
+                    <Button
+                      onClick={() => setOpenCamera(true)}
+                      className="h-9 text-xs"
+                    >
+                      📷 Capture Report
+                    </Button>
+                    {/* Device Upload */}
+                    <Button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="h-9 text-xs"
+                    >
+                      📁 Upload From Device
+                    </Button>
+
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*,.pdf"
+                      className="hidden"
+                      onChange={handleDeviceUpload}
+                    />
+
+                  </div>
+
+
+
+                  {/* Camera Flow */}
+                  {openCamera && (
+                    <CameraFlow
+                      onUploadSuccess={async (url: string) => {
+                        try {
+
+                          await uploadFileMutation.mutateAsync({
+                            file_url: url,
+                            type: "scan",
+                          });
+
+                          toast.success("Report uploaded successfully");
+                          setOpenCamera(false);
+
+                        } catch {
+                          toast.error("Failed to save report");
+                        }
+                      }}
+                    />
+                  )}
                 </Card>
               ) : (
                 <Card className="border-amber-100 bg-amber-50/50">
@@ -775,6 +839,6 @@ export default function PatientProfilePage() {
           </div>
         </form>
       </Modal>
-    </div>
+    </div >
   );
 }

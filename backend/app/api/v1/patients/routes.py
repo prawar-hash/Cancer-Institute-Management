@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-
+from .schemas import FileUploadRequest
 from app.core import permissions
 from app.db.session import get_db
 from app.models.patient import Patient
@@ -14,6 +14,19 @@ from app.services.patient import get_patients_list
 from app.services.audit import log_action
 
 router = APIRouter(prefix="/api/v1/patients", tags=["Patients"])
+
+@router.post("/api/v1/patients/{patient_id}/upload-file")
+async def upload_file(patient_id: int, data: FileUploadRequest):
+
+    print("FILE URL:", data.file_url)
+    print("TYPE:", data.type)
+
+    # 👉 यहाँ DB save logic रहेगा (already होगा तो रहने दें)
+
+    return {
+        "message": "File saved successfully",
+        "file_url": data.file_url
+    }
 
 @router.get("", response_model=PatientListResponse)
 async def list_patients(

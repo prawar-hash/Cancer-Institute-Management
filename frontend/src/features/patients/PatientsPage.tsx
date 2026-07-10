@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { toast } from 'react-hot-toast';
 import { UserPlus, Power, FileHeart } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
-
+import CameraFlow from "../camera/CameraFlow";
 import axios from 'axios';
 import { usePatientsList, useRegisterPatient } from './patientApi.ts';
 import { RootState } from '../../app/store.ts';
@@ -49,7 +49,9 @@ export default function PatientsPage() {
   const currentUser = useSelector((state: RootState) => state.auth.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(1);
-
+  // 👇 YAHI ADD KARNA HAI
+  const [openCamera, setOpenCamera] = useState(false);
+  const [showCameraOption, setShowCameraOption] = useState(false);
   // Dynamic filter states
   const [filters, setFilters] = useState({
     q: '',
@@ -139,13 +141,12 @@ export default function PatientsPage() {
         const val = String(info.getValue());
         return (
           <span
-            className={`inline-flex rounded-full px-2 py-0.5 text-xs font-bold uppercase tracking-wider ${
-              val === 'active'
-                ? 'bg-emerald-50 text-emerald-700'
-                : val === 'deceased'
+            className={`inline-flex rounded-full px-2 py-0.5 text-xs font-bold uppercase tracking-wider ${val === 'active'
+              ? 'bg-emerald-50 text-emerald-700'
+              : val === 'deceased'
                 ? 'bg-red-50 text-red-700'
                 : 'bg-gray-150 text-gray-600'
-            }`}
+              }`}
           >
             {val}
           </span>
@@ -320,6 +321,44 @@ export default function PatientsPage() {
               Register
             </Button>
           </div>
+
+          {/* Upload Report Button */}
+          <Button
+            type="button"
+            onClick={() => setShowCameraOption(true)}
+            className="h-9 text-xs"
+          >
+            Upload Report
+          </Button>
+
+          {/* Ask User */}
+          {showCameraOption && (
+            <div className="flex gap-2 mt-2">
+              <Button
+                type="button"
+                onClick={() => {
+                  setOpenCamera(true);
+                  setShowCameraOption(false);
+                }}
+                className="h-8 text-xs"
+              >
+                Use Camera
+              </Button>
+
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setShowCameraOption(false)}
+                className="h-8 text-xs"
+              >
+                Cancel
+              </Button>
+            </div>
+          )}
+
+          {/* Camera Flow */}
+          {openCamera && <CameraFlow />}
+
         </form>
       </Modal>
     </div>
