@@ -64,7 +64,7 @@ async def login(
     #    print("Password Match:", security.verify_password(user_in.password, user.hashed_password))
     
     if user:
-        print("=" * 60)
+        print("=" * 60)    
         print("Entered Email    :", user_in.email)
         print("Entered Password :", repr(user_in.password))
         print("DB Email         :", user.email)
